@@ -4,8 +4,19 @@ const app = express();
 
 const MongoClient = require('mongodb').MongoClient;
 
-const url = 'mongodb://localhost:27017'
+const url = 'mongodb+srv://wala:wala@cluster0.cjxf6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
+app.all('*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    // res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    // res.header('Access-Control-Allow-Headers', 'Content-Type');
+    // res.header('Content-Type', 'application/json');
+    if ('OPTIONS' == req.method) {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+});
 
 app.get('/secteur', (req, res) => {
     MongoClient.connect(url, function(err, db) {
@@ -20,12 +31,28 @@ app.get('/secteur', (req, res) => {
     });
 });
 
-app.get('/companies', (req, res) => {
+app.get('/companies', function (req, res) {
+    const page = Number(req.query.page) ;
+    const limit = Number(req.query.limit) || 0;
+    const companyName = req.query.name || '';
+    const location = req.query.location || '';
+
     MongoClient.connect(url, function(err, db){
         if (err) throw err;
-        let dbo = db.db('db');
-        dbo.collection("company_profiles").find({}
-        ,{fields:{ _id:1 ,overview:1}}).toArray(
+        const dbo = db.db('db');
+        const mongoRequest = dbo.collection("company_profiles").find(
+            {
+                "overview.name": {'$regex' : companyName, "$options" : "i"},
+                "overview.location": {'$regex' : location, "$options" : "i"},
+            },
+            {fields:{ _id:1 ,overview: {location: 1, name: 1, image:1, industry: 1, company_size: 1}}}
+            );
+
+        mongoRequest.count(function ());
+
+            mongoRequest.limit(limit)
+            .skip(page * limit)
+            .toArray(
             function(err, result) {
                 if (err) throw err;
                 res.json(result);
