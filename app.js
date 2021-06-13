@@ -133,10 +133,10 @@ app.get('/companies/:name/tech', function (req, res) {
         const dbo = db.db('db');
         dbo.collection("scraped_companies_wttj").findOne({
                 "name": {$regex: req.params.name, $options: 'i'}
-            },
+            }, {fields: {_id: 0, technologies: 1}},
             function (err, result) {
                 db.close();
-                if (err) {
+                if (err || !result) {
                     res.json([]);
                 } else {
                     res.json(result["technologies"]);
