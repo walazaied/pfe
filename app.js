@@ -52,7 +52,7 @@ app.get('/companies', function (req, res) {
     const secteurs = req.query.secteur || '';
     const size = req.query.size || '';
 
-    const query =  {
+    const query = {
         "overview.name": {'$regex': companyName, "$options": "i"},
         "overview.location": {'$regex': location, "$options": "i"},
         "overview.company_size": {'$regex': size, "$options": "i"}
@@ -68,7 +68,7 @@ app.get('/companies', function (req, res) {
         if (err) throw err;
         const dbo = db.db('db');
         const mongoRequest = dbo.collection("company_profiles").find(
-           query,
+            query,
             {
                 fields: {_id: 1, overview: {location: 1, name: 1, image: 1, industry: 1, company_size: 1}}
             }
@@ -135,9 +135,12 @@ app.get('/companies/:name/tech', function (req, res) {
                 "name": {$regex: req.params.name, $options: 'i'}
             }, {fields: {_id: 0, technologies: 1}},
             function (err, result) {
-                if (err) throw err;
-                res.json(result["technologies"]);
                 db.close();
+                if (err) {
+                    res.json([]);
+                } else {
+                    res.json(result["technologies"]);
+                }
             });
     });
 });
