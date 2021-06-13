@@ -4,7 +4,8 @@ const app = express();
 
 const MongoClient = require('mongodb').MongoClient;
 
-const url = 'mongodb+srv://wala:wala@cluster0.cjxf6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+//const url = 'mongodb+srv://wala:wala@cluster0.cjxf6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const url ='mongodb://localhost:27017';
 
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
