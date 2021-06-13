@@ -137,7 +137,7 @@ app.get('/companies/:name/tech', function (req, res) {
             function (err, result) {
                 db.close();
                 if (err || !result) {
-                    res.json([]);
+                    res.json({});
                 } else {
                     res.json(result["technologies"]);
                 }
